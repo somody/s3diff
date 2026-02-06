@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 from collections import defaultdict
+from itertools import combinations
 from pathlib import Path
 from typing import Dict, List, Tuple, Set
 
@@ -70,7 +71,7 @@ def group_folders_by_base(folders: List[str]) -> Dict[str, List[str]]:
 
 
 def find_folder_pairs(folder_groups: Dict[str, List[str]]) -> List[Tuple[str, str]]:
-    """Find pairs of folders (base + suffixed versions)."""
+    """Find pairs of folders (base + suffixed versions). Does pairwise for 3+ folders."""
     pairs = []
     
     for base_name, group_folders in folder_groups.items():
@@ -79,7 +80,10 @@ def find_folder_pairs(folder_groups: Dict[str, List[str]]) -> List[Tuple[str, st
             sorted_folders = sorted(group_folders, key=len)
             pairs.append((sorted_folders[0], sorted_folders[1]))
         elif len(group_folders) > 2:
-            print(f"Warning: Found {len(group_folders)} folders for base '{base_name}': {group_folders}")
+            # Do pairwise comparison for all combinations
+            sorted_folders = sorted(group_folders, key=len)
+            for folder1, folder2 in combinations(sorted_folders, 2):
+                pairs.append((folder1, folder2))
     
     return pairs
 
